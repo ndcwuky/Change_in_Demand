@@ -379,12 +379,40 @@
                 const resizeCanvas = () => {
                     const container = this.canvas.parentElement;
                     const rect = container.getBoundingClientRect();
-                    const scale = Math.min(rect.width / 600, 1);
+                    
+                    // 檢測是否為手機設備
+                    const isMobile = window.innerWidth <= 768;
+                    const isPortrait = window.innerHeight > window.innerWidth;
+                    
+                    let scale;
+                    if (isMobile && isPortrait) {
+                        // 手機垂直模式：使用更大的最小縮放比例，確保圖表足夠大
+                        const containerScale = rect.width / 600;
+                        scale = Math.max(containerScale, 0.7); // 最小縮放比例為0.7
+                        scale = Math.min(scale, 1.2); // 最大縮放比例為1.2
+                    } else {
+                        // 桌面或平板模式：使用原來的邏輯
+                        scale = Math.min(rect.width / 600, 1);
+                    }
+                    
                     this.canvas.style.transform = `scale(${scale})`;
                     this.canvas.style.transformOrigin = 'top left';
+                    
+                    // 動態調整容器高度以適應縮放後的圖表
+                    if (isMobile && isPortrait) {
+                        const scaledHeight = 400 * scale;
+                        container.style.height = `${scaledHeight}px`;
+                        container.style.overflow = 'visible';
+                    } else {
+                        container.style.height = 'auto';
+                        container.style.overflow = 'hidden';
+                    }
                 };
                 
                 window.addEventListener('resize', resizeCanvas);
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(resizeCanvas, 100); // 延遲執行以確保orientationchange完成
+                });
                 resizeCanvas();
             }
             
