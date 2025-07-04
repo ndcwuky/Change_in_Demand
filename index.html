@@ -388,8 +388,8 @@
                     if (isMobile && isPortrait) {
                         // 手機垂直模式：使用更大的最小縮放比例，確保圖表足夠大
                         const containerScale = rect.width / 600;
-                        scale = Math.max(containerScale, 0.7); // 最小縮放比例為0.7
-                        scale = Math.min(scale, 1.2); // 最大縮放比例為1.2
+                        scale = Math.max(containerScale, 0.85); // 最小縮放比例為0.85（增大25%）
+                        scale = Math.min(scale, 1.4); // 最大縮放比例為1.4
                     } else {
                         // 桌面或平板模式：使用原來的邏輯
                         scale = Math.min(rect.width / 600, 1);
