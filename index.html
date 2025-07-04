@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供需均衡互動教學</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        .dark {
+            color-scheme: dark;
+        }
+        
+        canvas {
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .dark canvas {
+            background: #2d3748;
+        }
+        
+        .btn-primary {
+            background: #5D5CDE;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #4c4bcc;
+            transform: translateY(-1px);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .card {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+        }
+        
+        .animate-bounce-gentle {
+            animation: bounce-gentle 1s ease-in-out infinite;
+        }
+        
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- 標題 -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2 text-primary">供需均衡互動教學</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">觀察需求變化對均衡價格和數量的影響</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 控制面板 -->
+            <div class="lg:col-span-1">
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-center">控制面板</h2>
+                    
+                    <!-- 需求調整 -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-3">需求曲線調整</label>
+                        <div class="space-y-3">
+                            <button id="increaseDemand" class="btn-primary text-white px-4 py-2 rounded-lg w-full text-base font-medium">
+                                需求上升 ↗️
+                            </button>
+                            <button id="decreaseDemand" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg w-full text-base font-medium transition-all duration-200">
+                                需求下降 ↘️
+                            </button>
+                            <button id="resetDemand" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg w-full text-base font-medium transition-all duration-200">
+                                重設 🔄
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- 圖表區域 -->
+            <div class="lg:col-span-2">
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-center">供需均衡圖</h2>
+                    <div class="relative">
+                        <canvas id="economicsChart" width="600" height="400" class="w-full max-w-full"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 互動測驗區域 -->
+        <div class="mt-8 card p-6">
+            <h2 class="text-xl font-semibold mb-6 text-center">💭 互動測驗</h2>
+            
+            <!-- 問題1 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 1：當需求上升時，均衡價格和均衡數量會如何改變？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="1" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 均衡價格上升，均衡數量增加
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="1" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 均衡價格下降，均衡數量減少
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="1" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 均衡價格上升，均衡數量減少
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="1" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 均衡價格下降，均衡數量增加
+                    </button>
+                </div>
+                <div id="feedback-1" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- 問題2 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 2：當需求下降時，均衡價格和均衡數量會如何改變？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="2" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 均衡價格上升，均衡數量增加
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="2" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 均衡價格下降，均衡數量減少
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="2" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 均衡價格上升，均衡數量減少
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="2" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 均衡價格下降，均衡數量增加
+                    </button>
+                </div>
+                <div id="feedback-2" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- 問題3 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 3：如果人們預期物品X的價格上升，現在物品X的均衡價格有何影響呢？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="3" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 現在的均衡價格上升
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="3" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 現在的均衡價格下降
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="3" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 現在的均衡價格不變
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="3" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 無法確定影響方向
+                    </button>
+                </div>
+                <div id="feedback-3" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- 問題4 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 4：如果物品X和物品Y是代替品，當物品X的均衡價格上升時，物品Y的均衡數量如何改變？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="4" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 物品Y的均衡數量增加
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="4" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 物品Y的均衡數量減少
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="4" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 物品Y的均衡數量不變
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="4" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 無法確定影響方向
+                    </button>
+                </div>
+                <div id="feedback-4" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- 問題5 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 5：如果經濟衰退，物品X是劣等物品，它的均衡價格會如何改變呢？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="5" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 均衡價格上升
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="5" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 均衡價格下降
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="5" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 均衡價格不變
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="5" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 無法確定影響方向
+                    </button>
+                </div>
+                <div id="feedback-5" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- 問題6 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 6：物品X是物品Y的引申需求，當人們對物品Y的需求下降時，這對物品X的均衡數量有何影響呢？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="6" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 物品X的均衡數量增加
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="6" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 物品X的均衡數量減少
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="6" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 物品X的均衡數量不變
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="6" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 無法確定影響方向
+                    </button>
+                </div>
+                <div id="feedback-6" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- 問題7 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
+                    問題 7：物品X是物品Y的輔助品，當物品Y的均衡價格下降，這對物品X的均衡價格有何影響呢？
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="7" data-answer="A">
+                        <span class="font-medium text-primary">A.</span> 物品X的均衡價格上升
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="7" data-answer="B">
+                        <span class="font-medium text-primary">B.</span> 物品X的均衡價格下降
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="7" data-answer="C">
+                        <span class="font-medium text-primary">C.</span> 物品X的均衡價格不變
+                    </button>
+                    <button class="quiz-option text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200" 
+                            data-question="7" data-answer="D">
+                        <span class="font-medium text-primary">D.</span> 無法確定影響方向
+                    </button>
+                </div>
+                <div id="feedback-7" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+        </div>
+
+        <!-- 說明區域 -->
+        <div class="mt-8 card p-6">
+            <h2 class="text-xl font-semibold mb-4">經濟學概念說明</h2>
+            
+            <!-- 互動說明 -->
+            <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h3 class="font-semibold text-blue-700 dark:text-blue-300 mb-2">📱 互動功能</h3>
+                <p class="text-sm text-blue-600 dark:text-blue-400">
+                    先點擊按鈕創建新的需求曲線（D₂），然後可以用滑鼠或手指直接拖動需求曲線上下移動，觀察均衡點的實時變化！
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div>
+                    <h3 class="font-semibold text-primary mb-2">需求上升的影響：</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                        <li>需求曲線向右上方移動</li>
+                        <li>均衡價格上升</li>
+                        <li>均衡數量增加</li>
+                        <li>市場出現短期供不應求</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-red-500 mb-2">需求下降的影響：</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                        <li>需求曲線向左下方移動</li>
+                        <li>均衡價格下降</li>
+                        <li>均衡數量減少</li>
+                        <li>市場出現短期供過於求</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 深色模式設定
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // 經濟學圖表類
+        class EconomicsChart {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.width = this.canvas.width;
+                this.height = this.canvas.height;
+                
+                // 初始需求偏移
+                this.demandShift = 0;
+                
+                // 設定圖表邊距
+                this.margin = 60;
+                this.chartWidth = this.width - 2 * this.margin;
+                this.chartHeight = this.height - 2 * this.margin;
+                
+                // 拖動相關狀態
+                this.isDragging = false;
+                this.isHovering = false;
+                this.dragStartY = 0;
+                this.initialShift = 0;
+                
+                this.setupEventListeners();
+                this.setupInteractionListeners();
+                this.draw();
+            }
+            
+            setupEventListeners() {
+                // 響應式調整
+                const resizeCanvas = () => {
+                    const container = this.canvas.parentElement;
+                    const rect = container.getBoundingClientRect();
+                    const scale = Math.min(rect.width / 600, 1);
+                    this.canvas.style.transform = `scale(${scale})`;
+                    this.canvas.style.transformOrigin = 'top left';
+                };
+                
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+            }
+            
+            // 供給函數 (向上傾斜)
+            supplyFunction(quantity) {
+                return 5 + 0.05 * quantity;
+            }
+            
+            // 原始需求函數 (無偏移)
+            originalDemandFunction(quantity) {
+                return 15 - 0.05 * quantity;
+            }
+            
+            // 需求函數 (向下傾斜，加上偏移)
+            demandFunction(quantity) {
+                return 15 - 0.05 * quantity + this.demandShift;
+            }
+            
+            // 計算原始均衡點
+            calculateOriginalEquilibrium() {
+                // 求解供需相等: 5 + 0.05 * Q = 15 - 0.05 * Q
+                // 0.1 * Q = 10
+                // Q = 100
+                const equilibriumQuantity = 100;
+                const equilibriumPrice = this.supplyFunction(equilibriumQuantity);
+                
+                return { quantity: equilibriumQuantity, price: equilibriumPrice };
+            }
+            
+            // 計算新均衡點
+            calculateNewEquilibrium() {
+                // 求解供需相等: 5 + 0.05 * Q = 15 - 0.05 * Q + shift
+                // 0.1 * Q = 10 + shift
+                // Q = (10 + shift) / 0.1
+                const equilibriumQuantity = (10 + this.demandShift) / 0.1;
+                const equilibriumPrice = this.supplyFunction(equilibriumQuantity);
+                
+                return { quantity: equilibriumQuantity, price: equilibriumPrice };
+            }
+            
+            // 座標轉換
+            toCanvasX(quantity) {
+                return this.margin + (quantity / 200) * this.chartWidth;
+            }
+            
+            toCanvasY(price) {
+                return this.height - this.margin - ((price - 0) / 20) * this.chartHeight;
+            }
+            
+            draw() {
+                // 清除畫布
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                // 設定顏色（根據深色模式）
+                const isDark = document.documentElement.classList.contains('dark');
+                const textColor = isDark ? '#e2e8f0' : '#374151';
+                const gridColor = isDark ? '#4a5568' : '#d1d5db';
+                const axisColor = isDark ? '#718096' : '#6b7280';
+                
+                // 繪製座標軸
+                this.drawAxes(textColor, axisColor);
+                
+                // 繪製格線
+                this.drawGrid(gridColor);
+                
+                // 繪製供給曲線
+                this.drawSupplyCurve();
+                
+                // 繪製需求曲線
+                this.drawDemandCurve();
+                
+                // 繪製均衡點
+                this.drawEquilibrium();
+                
+                // 更新數值顯示
+                this.updateDisplay();
+            }
+            
+            drawAxes(textColor, axisColor) {
+                this.ctx.strokeStyle = axisColor;
+                this.ctx.lineWidth = 2;
+                this.ctx.font = '14px Noto Sans TC';
+                this.ctx.fillStyle = textColor;
+                
+                // X軸
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.margin, this.height - this.margin);
+                this.ctx.lineTo(this.width - this.margin, this.height - this.margin);
+                this.ctx.stroke();
+                
+                // Y軸
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.margin, this.margin);
+                this.ctx.lineTo(this.margin, this.height - this.margin);
+                this.ctx.stroke();
+                
+                // 軸標籤
+                // X軸標籤放在右方
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('數量 (Quantity)', this.width - this.margin - 20, this.height - 20);
+                
+                // Y軸標籤放在頂部
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText('價格 (Price)', 15, 25);
+            }
+            
+            drawGrid(gridColor) {
+                this.ctx.strokeStyle = gridColor;
+                this.ctx.lineWidth = 0.3;
+                
+                // 垂直線 (淡化格線)
+                for (let q = 0; q <= 200; q += 50) {
+                    const x = this.toCanvasX(q);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, this.margin);
+                    this.ctx.lineTo(x, this.height - this.margin);
+                    this.ctx.stroke();
+                }
+                
+                // 水平線 (淡化格線)
+                for (let p = 0; p <= 20; p += 5) {
+                    const y = this.toCanvasY(p);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.margin, y);
+                    this.ctx.lineTo(this.width - this.margin, y);
+                    this.ctx.stroke();
+                }
+            }
+            
+            drawSupplyCurve() {
+                this.ctx.strokeStyle = '#ef4444';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                
+                for (let q = 0; q <= 200; q += 1) {
+                    const price = this.supplyFunction(q);
+                    const x = this.toCanvasX(q);
+                    const y = this.toCanvasY(price);
+                    
+                    if (q === 0) {
+                        this.ctx.moveTo(x, y);
+                    } else {
+                        this.ctx.lineTo(x, y);
+                    }
+                }
+                
+                this.ctx.stroke();
+                
+                // S 標籤 - 放在曲線末端右方，稍微高一點
+                const sEndQ = 190;
+                const sEndPrice = this.supplyFunction(sEndQ);
+                const sEndX = this.toCanvasX(sEndQ);
+                const sEndY = this.toCanvasY(sEndPrice);
+                
+                this.ctx.fillStyle = '#ef4444';
+                this.ctx.font = 'bold 18px Noto Sans TC';
+                this.ctx.fillText('S', sEndX + 10, sEndY - 8);
+            }
+            
+            drawDemandCurve() {
+                // 繪製原始需求曲線 D1 (藍色實線)
+                this.ctx.strokeStyle = '#3b82f6';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                
+                for (let q = 0; q <= 200; q += 1) {
+                    const price = this.originalDemandFunction(q);
+                    if (price < 0) continue;
+                    
+                    const x = this.toCanvasX(q);
+                    const y = this.toCanvasY(price);
+                    
+                    if (q === 0) {
+                        this.ctx.moveTo(x, y);
+                    } else {
+                        this.ctx.lineTo(x, y);
+                    }
+                }
+                
+                this.ctx.stroke();
+                
+                // 繪製新需求曲線 D2
+                if (this.demandShift !== 0) {
+                    this.ctx.strokeStyle = '#1d4ed8';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    
+                    for (let q = 0; q <= 200; q += 1) {
+                        const price = this.demandFunction(q);
+                        if (price < 0) continue;
+                        
+                        const x = this.toCanvasX(q);
+                        const y = this.toCanvasY(price);
+                        
+                        if (q === 0) {
+                            this.ctx.moveTo(x, y);
+                        } else {
+                            this.ctx.lineTo(x, y);
+                        }
+                    }
+                    
+                    this.ctx.stroke();
+                }
+                
+                // 標籤 - 放在曲線右方
+                this.ctx.font = 'bold 16px Noto Sans TC';
+                
+                // D₁ 標籤 (在曲線末端右方)
+                const d1EndQ = 200;
+                const d1EndPrice = this.originalDemandFunction(d1EndQ);
+                if (d1EndPrice > 0) {
+                    const d1EndX = this.toCanvasX(d1EndQ);
+                    const d1EndY = this.toCanvasY(d1EndPrice);
+                    
+                    this.ctx.fillStyle = '#3b82f6';
+                    this.ctx.font = 'bold 18px Noto Sans TC';
+                    this.ctx.fillText('D₁', d1EndX + 10, d1EndY + 5);
+                }
+                
+                // D₂ 標籤 (如果有變化，在曲線末端右方)
+                if (this.demandShift !== 0) {
+                    const d2EndQ = 200;
+                    const d2EndPrice = this.demandFunction(d2EndQ);
+                    if (d2EndPrice > 0) {
+                        const d2EndX = this.toCanvasX(d2EndQ);
+                        const d2EndY = this.toCanvasY(d2EndPrice);
+                        
+                        this.ctx.fillStyle = '#1d4ed8';
+                        this.ctx.font = 'bold 18px Noto Sans TC';
+                        this.ctx.fillText('D₂', d2EndX + 10, d2EndY + 5);
+                    }
+                }
+            }
+            
+            drawEquilibrium() {
+                const originalEq = this.calculateOriginalEquilibrium();
+                const originalX = this.toCanvasX(originalEq.quantity);
+                const originalY = this.toCanvasY(originalEq.price);
+                
+                // 繪製原始均衡點的虛線到座標軸
+                this.ctx.strokeStyle = '#9ca3af';
+                this.ctx.lineWidth = 1;
+                this.ctx.setLineDash([4, 4]);
+                
+                // P1 到Y軸的線
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.margin, originalY);
+                this.ctx.lineTo(originalX, originalY);
+                this.ctx.stroke();
+                
+                // Q1 到X軸的線
+                this.ctx.beginPath();
+                this.ctx.moveTo(originalX, originalY);
+                this.ctx.lineTo(originalX, this.height - this.margin);
+                this.ctx.stroke();
+                
+                this.ctx.setLineDash([]);
+                
+                // 繪製原始均衡點 (P1, Q1)
+                this.ctx.fillStyle = '#6b7280';
+                this.ctx.strokeStyle = '#374151';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.arc(originalX, originalY, 7, 0, 2 * Math.PI);
+                this.ctx.fill();
+                this.ctx.stroke();
+                
+                // P₁, Q₁ 標籤
+                this.ctx.font = 'bold 14px Noto Sans TC';
+                this.ctx.fillStyle = '#9ca3af';
+                this.ctx.fillText('P₁', this.margin - 25, originalY + 4);
+                this.ctx.fillText('Q₁', originalX - 8, this.height - this.margin + 20);
+                
+                // 如果有需求變化，繪製新均衡點
+                if (this.demandShift !== 0) {
+                    const newEq = this.calculateNewEquilibrium();
+                    const newX = this.toCanvasX(newEq.quantity);
+                    const newY = this.toCanvasY(newEq.price);
+                    
+                    // 繪製新均衡點的虛線到座標軸
+                    this.ctx.strokeStyle = '#3b82f6';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.setLineDash([6, 3]);
+                    
+                    // P2 到Y軸的線
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.margin, newY);
+                    this.ctx.lineTo(newX, newY);
+                    this.ctx.stroke();
+                    
+                    // Q2 到X軸的線
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(newX, newY);
+                    this.ctx.lineTo(newX, this.height - this.margin);
+                    this.ctx.stroke();
+                    
+                    this.ctx.setLineDash([]);
+                    
+                    // 繪製新均衡點 (P2, Q2)
+                    this.ctx.fillStyle = '#3b82f6';
+                    this.ctx.strokeStyle = '#2563eb';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    this.ctx.arc(newX, newY, 7, 0, 2 * Math.PI);
+                    this.ctx.fill();
+                    this.ctx.stroke();
+                    
+                    // P₂, Q₂ 標籤
+                    this.ctx.fillStyle = '#2563eb';
+                    this.ctx.font = 'bold 14px Noto Sans TC';
+                    this.ctx.fillText('P₂', this.margin - 25, newY + 4);
+                    this.ctx.fillText('Q₂', newX - 8, this.height - this.margin + 20);
+                    
+                    // 繪製箭頭
+                    this.drawArrows(originalEq, newEq, originalX, originalY, newX, newY);
+                }
+            }
+            
+            // 繪製箭頭函數
+            drawArrows(originalEq, newEq, originalX, originalY, newX, newY) {
+                this.ctx.strokeStyle = '#f97316';
+                this.ctx.fillStyle = '#f97316';
+                this.ctx.lineWidth = 3;
+                
+                // D1 到 D2 的箭頭 (純水平方向，在曲線左側位置，避免與D標籤重疊)
+                const arrowQ = 80; // 移到更左側，避免與D₁, D₂標籤重疊
+                const d1ArrowY = this.toCanvasY(this.originalDemandFunction(arrowQ));
+                const d2ArrowY = this.toCanvasY(this.demandFunction(arrowQ));
+                const arrowX = this.toCanvasX(arrowQ);
+                
+                // 純水平箭頭，在同一水平線上，根據需求變化方向決定箭頭方向
+                const demandArrowY = (d1ArrowY + d2ArrowY) / 2; // 使用中間位置的Y座標
+                const horizontalOffset = 25;
+                
+                if (this.demandShift > 0) {
+                    // 需求上升：箭頭向右
+                    this.drawArrow(arrowX - horizontalOffset, demandArrowY, arrowX + horizontalOffset, demandArrowY);
+                } else {
+                    // 需求下降：箭頭向左
+                    this.drawArrow(arrowX + horizontalOffset, demandArrowY, arrowX - horizontalOffset, demandArrowY);
+                }
+                
+                // P1 到 P2 的箭頭 (垂直方向，避免與P標籤重疊)
+                this.drawArrow(this.margin - 45, originalY, this.margin - 45, newY);
+                
+                // Q1 到 Q2 的箭頭 (水平方向，更遠離Q標籤)
+                this.drawArrow(originalX, this.height - this.margin + 35, newX, this.height - this.margin + 35);
+            }
+            
+            // 繪製單個箭頭
+            drawArrow(startX, startY, endX, endY) {
+                const headlen = 12;
+                const angle = Math.atan2(endY - startY, endX - startX);
+                
+                // 繪製箭頭線
+                this.ctx.beginPath();
+                this.ctx.moveTo(startX, startY);
+                this.ctx.lineTo(endX, endY);
+                this.ctx.stroke();
+                
+                // 繪製並填充箭頭頭部（實心三角形）
+                this.ctx.beginPath();
+                this.ctx.moveTo(endX, endY);
+                this.ctx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 6), endY - headlen * Math.sin(angle - Math.PI / 6));
+                this.ctx.lineTo(endX - headlen * Math.cos(angle + Math.PI / 6), endY - headlen * Math.sin(angle + Math.PI / 6));
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.stroke();
+            }
+            
+            updateDisplay() {
+                // 不再需要更新顯示面板，因為已經移除
+            }
+            
+            increaseDemand() {
+                this.demandShift += 3;
+                this.animateDraw();
+            }
+            
+            decreaseDemand() {
+                this.demandShift -= 3;
+                this.animateDraw();
+            }
+            
+            resetDemand() {
+                this.demandShift = 0;
+                this.animateDraw();
+            }
+            
+            animateDraw() {
+                // 簡單的重繪動畫
+                this.canvas.style.transform += ' scale(1.02)';
+                setTimeout(() => {
+                    this.canvas.style.transform = this.canvas.style.transform.replace(' scale(1.02)', '');
+                    this.draw();
+                }, 100);
+                
+                this.draw();
+            }
+            
+            // 設置交互監聽器
+            setupInteractionListeners() {
+                // 滑鼠事件
+                this.canvas.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.canvas.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.canvas.addEventListener('mouseleave', (e) => this.handleEnd(e));
+                
+                // 觸控事件
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleStart(e.touches[0]);
+                });
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.handleMove(e.touches[0]);
+                });
+                this.canvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.handleEnd(e);
+                });
+                
+                // 改變游標樣式
+                this.canvas.addEventListener('mousemove', (e) => {
+                    if (!this.isDragging) {
+                        this.updateCursor(e);
+                    }
+                });
+            }
+            
+            // 獲取滑鼠/觸控位置
+            getEventPos(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+            
+            // 檢查是否在可拖動的需求曲線附近
+            isNearDemandCurve(pos) {
+                if (this.demandShift === 0) return false; // 只有當有新需求曲線時才能拖動
+                
+                const tolerance = 15; // 容許的距離
+                const testQuantity = 100; // 在圖表中間檢測
+                
+                if (pos.x < this.margin || pos.x > this.width - this.margin) return false;
+                if (pos.y < this.margin || pos.y > this.height - this.margin) return false;
+                
+                // 將畫布座標轉換為邏輯座標
+                const quantity = ((pos.x - this.margin) / this.chartWidth) * 200;
+                const price = ((this.height - this.margin - pos.y) / this.chartHeight) * 20;
+                
+                // 計算在這個數量下的需求曲線價格
+                const demandPrice = this.demandFunction(quantity);
+                
+                // 檢查是否在曲線附近
+                return Math.abs(price - demandPrice) < tolerance * (20 / this.chartHeight);
+            }
+            
+            // 處理開始拖動
+            handleStart(e) {
+                const pos = this.getEventPos(e);
+                
+                if (this.isNearDemandCurve(pos)) {
+                    this.isDragging = true;
+                    this.dragStartY = pos.y;
+                    this.initialShift = this.demandShift;
+                    this.canvas.style.cursor = 'grabbing';
+                }
+            }
+            
+            // 處理拖動移動
+            handleMove(e) {
+                const pos = this.getEventPos(e);
+                
+                if (this.isDragging) {
+                    // 計算垂直移動距離
+                    const deltaY = this.dragStartY - pos.y; // 向上為正
+                    const priceChange = (deltaY / this.chartHeight) * 20; // 轉換為價格單位
+                    
+                    // 更新需求偏移，限制在合理範圍內
+                    this.demandShift = Math.max(-10, Math.min(10, this.initialShift + priceChange));
+                    
+                    // 實時重繪
+                    this.draw();
+                }
+            }
+            
+            // 處理結束拖動
+            handleEnd(e) {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.canvas.style.cursor = 'default';
+                }
+            }
+            
+            // 更新游標樣式
+            updateCursor(e) {
+                const pos = this.getEventPos(e);
+                
+                if (this.isNearDemandCurve(pos)) {
+                    this.canvas.style.cursor = 'grab';
+                    this.isHovering = true;
+                } else {
+                    this.canvas.style.cursor = 'default';
+                    this.isHovering = false;
+                }
+            }
+        }
+
+        // 初始化應用
+        document.addEventListener('DOMContentLoaded', function() {
+            const chart = new EconomicsChart('economicsChart');
+            
+            // 按鈕事件
+            document.getElementById('increaseDemand').addEventListener('click', () => {
+                chart.increaseDemand();
+            });
+            
+            document.getElementById('decreaseDemand').addEventListener('click', () => {
+                chart.decreaseDemand();
+            });
+            
+            document.getElementById('resetDemand').addEventListener('click', () => {
+                chart.resetDemand();
+            });
+            
+            // 測驗功能
+            setupQuiz();
+        });
+        
+        // 設置測驗功能
+        function setupQuiz() {
+            const quizOptions = document.querySelectorAll('.quiz-option');
+            
+            // 正確答案
+            const correctAnswers = {
+                '1': 'A', // 需求上升：均衡價格上升，均衡數量增加
+                '2': 'B', // 需求下降：均衡價格下降，均衡數量減少
+                '3': 'A', // 預期價格上升：現在均衡價格上升
+                '4': 'A', // 代替品價格上升：另一代替品均衡數量增加
+                '5': 'A', // 經濟衰退：劣等物品均衡價格上升
+                '6': 'B', // 引申需求：Y需求下降導致X均衡數量減少
+                '7': 'A'  // 輔助品：Y價格下降導致X均衡價格上升
+            };
+            
+            // 答案解釋
+            const explanations = {
+                '1': {
+                    'A': '✅ 正確！當需求上升時，需求曲線向右上方移動，與供給曲線的交點上移，導致均衡價格上升，均衡數量增加。',
+                    'B': '❌ 錯誤。需求上升會使價格和數量都增加，而不是減少。',
+                    'C': '❌ 錯誤。需求上升會使數量增加，而不是減少。',
+                    'D': '❌ 錯誤。需求上升會使價格上升，而不是下降。'
+                },
+                '2': {
+                    'A': '❌ 錯誤。需求下降會使價格和數量都減少，而不是增加。',
+                    'B': '✅ 正確！當需求下降時，需求曲線向左下方移動，與供給曲線的交點下移，導致均衡價格下降，均衡數量減少。',
+                    'C': '❌ 錯誤。需求下降會使價格下降，而不是上升。',
+                    'D': '❌ 錯誤。需求下降會使數量減少，而不是增加。'
+                },
+                '3': {
+                    'A': '✅ 正確！當人們預期價格上升時，會增加當前的購買（需求增加），導致現在的均衡價格立即上升。這是預期的自我實現效應。',
+                    'B': '❌ 錯誤。預期價格上升會促使人們提前購買，增加當前需求，推高而非降低現在的價格。',
+                    'C': '❌ 錯誤。預期會影響當前的購買行為，不可能對價格沒有影響。',
+                    'D': '❌ 錯誤。預期價格上升必然會增加當前需求，方向是確定的。'
+                },
+                '4': {
+                    'A': '✅ 正確！當代替品X價格上升時，消費者會轉向購買代替品Y，使Y的需求增加，導致Y的均衡數量增加。',
+                    'B': '❌ 錯誤。代替品X漲價會促使消費者轉向Y，增加而非減少Y的數量。',
+                    'C': '❌ 錯誤。代替品關係意味著一方漲價必然影響另一方的需求，不可能不變。',
+                    'D': '❌ 錯誤。代替品的作用方向是確定的，X漲價必然促進Y的銷售。'
+                },
+                '5': {
+                    'A': '✅ 正確！經濟衰退時收入下降，而劣等物品需求與收入成反比，收入減少會使劣等物品需求增加，導致均衡價格上升。',
+                    'B': '❌ 錯誤。劣等物品的特性是收入下降時需求增加，會推高而非降低價格。',
+                    'C': '❌ 錯誤。經濟衰退必然影響劣等物品的需求，不可能價格不變。',
+                    'D': '❌ 錯誤。劣等物品與收入的反向關係是確定的，方向可以預測。'
+                },
+                '6': {
+                    'A': '❌ 錯誤。引申需求與原始需求呈正相關，Y需求下降會使X需求也下降，數量減少而非增加。',
+                    'B': '✅ 正確！引申需求是指對某商品的需求源於對另一商品的需求。當Y需求下降時，對X的引申需求也下降，導致X的均衡數量減少。',
+                    'C': '❌ 錯誤。引申需求關係意味著兩者需求同向變動，不可能Y變化而X不變。',
+                    'D': '❌ 錯誤。引申需求的方向是確定的，與原始需求呈正相關關係。'
+                },
+                '7': {
+                    'A': '✅ 正確！輔助品通常一起使用，當Y價格下降時，對Y的需求增加，帶動對輔助品X的需求也增加，導致X的均衡價格上升。',
+                    'B': '❌ 錯誤。輔助品的需求與原商品同向變動，Y變便宜促進Y和X的銷售，會推高X的價格。',
+                    'C': '❌ 錯誤。輔助品關係意味著兩者需求連動，Y價格變化必然影響X的需求和價格。',
+                    'D': '❌ 錯誤。輔助品的影響方向是確定的，與原商品呈正相關關係。'
+                }
+            };
+            
+            quizOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const question = this.dataset.question;
+                    const answer = this.dataset.answer;
+                    const feedback = document.getElementById(`feedback-${question}`);
+                    
+                    // 移除所有同組選項的選中狀態
+                    const sameGroupOptions = document.querySelectorAll(`[data-question="${question}"]`);
+                    sameGroupOptions.forEach(opt => {
+                        opt.classList.remove('border-green-500', 'border-red-500', 'bg-green-50', 'bg-red-50');
+                        opt.classList.remove('dark:bg-green-900/20', 'dark:bg-red-900/20');
+                        opt.classList.add('border-gray-200', 'dark:border-gray-600');
+                    });
+                    
+                    // 標記當前選項
+                    const isCorrect = answer === correctAnswers[question];
+                    if (isCorrect) {
+                        this.classList.remove('border-gray-200', 'dark:border-gray-600');
+                        this.classList.add('border-green-500', 'bg-green-50', 'dark:bg-green-900/20');
+                    } else {
+                        this.classList.remove('border-gray-200', 'dark:border-gray-600');
+                        this.classList.add('border-red-500', 'bg-red-50', 'dark:bg-red-900/20');
+                        
+                        // 同時標記正確答案
+                        const correctOption = document.querySelector(`[data-question="${question}"][data-answer="${correctAnswers[question]}"]`);
+                        correctOption.classList.remove('border-gray-200', 'dark:border-gray-600');
+                        correctOption.classList.add('border-green-500', 'bg-green-50', 'dark:bg-green-900/20');
+                    }
+                    
+                    // 顯示反饋
+                    feedback.className = `mt-4 p-4 rounded-lg ${isCorrect ? 'bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700' : 'bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700'}`;
+                    feedback.innerHTML = `<p class="${isCorrect ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'}">${explanations[question][answer]}</p>`;
+                    feedback.classList.remove('hidden');
+                    
+                    // 平滑滾動到反饋
+                    feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            });
+        }
+    </script>
+</body>
+</html>
